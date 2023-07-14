@@ -33,7 +33,7 @@ All robot output will be recorded in an output file named output.txt. The file w
 # How
 This project utilizes the console output and basic animation techniques to represent the grid and robot movement. The program uses simple clear console functions that support both Linux and Windows environments, allowing the grid and robot movements to be displayed cleanly.
 The program draws each frame of the grid using a function and incorporates delays using the sleep function to allow for step-by-step tracking of the robot's movements.
-To learn more about how to make simple console animation you can check out this [simple program](http://paste4btc.com/Lu9Cvpd9)
+To learn more about how to make simple console animation you can check out this [simple program](http://paste4btc.com/Lu9Cvpd9).
 
 # License
 This project is released under the MIT License.
