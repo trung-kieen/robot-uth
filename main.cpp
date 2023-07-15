@@ -25,7 +25,7 @@
 #define PAIR_ALLOWED_OVERRIDE 3
 /*
 Authur: Nguyen Khac Trung Kien
-Email: trungkien4869@gmail.com
+Email: trungkiennk4869@gmail.com
 Github-name:trung-kieen
 ________________________________
 Description of this file.
@@ -39,7 +39,7 @@ private:
   std::vector<int> point;
   // in MODE 2 used variable visited in main function.
   std::vector<std::vector<bool>> visited;
-  int sign;
+  char sign;
   std::string name;
 
 public:
@@ -67,12 +67,13 @@ public:
   }
 
   void move(int direction, std::vector<std::vector<int>> &matrixInput,
-            std::vector<std::vector<bool>> &mainVisitedMap) {
+            std::vector<std::vector<bool>> &mainVisitedMap, int mode) {
     if (direction == END_PATH) {
 
-      std::cout << "Robot " << name << ":\n";
+      std::cout << "Robot " << name << " (sign " << sign << ") "
+                << ":\n";
       showPoints();
-      drawMapVisited(matrixInput);
+      drawPath(matrixInput, mode);
       return;
     }
 
@@ -101,9 +102,10 @@ public:
     point.push_back(matrixInput[x][y]);
     visited[x][y] = true;
     mainVisitedMap[x][y] = true;
-    std::cout << "Robot " << name << ":\n";
+    std::cout << "Robot " << name << " (sign " << sign << ") "
+              << ":\n";
     showPoints();
-    drawMapVisited(matrixInput);
+    drawPath(matrixInput, mode);
   }
   bool isPossibleMove(int moveDirection, int mode,
                       std::vector<std::vector<bool>> &mainVisitedMap) {
@@ -243,29 +245,31 @@ public:
       sum += point[i];
     return sum;
   }
-  void drawMapVisited(std::vector<std::vector<int>> &matrixInput) {
+  void drawPath(std::vector<std::vector<int>> &matrixInput, int mode) {
     // Sign is the character repersent robot path
-    std::cout << '\n';
-    for (int i = 0; i < cols; i++) {
-      std::cout << "----------------";
-    }
-    std::cout << "-\n";
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < cols; j++) {
-        if (j == 0) {
-          std::cout << "|\t";
-        }
-        if (visited[i][j]) {
-          std::cout << (char)sign << "\t|\t";
-        } else {
-          std::cout << matrixInput[i][j] << "\t|\t";
-        }
-      }
+    if (mode != PAIR_NOT_OVERRIDE) {
       std::cout << '\n';
       for (int i = 0; i < cols; i++) {
         std::cout << "----------------";
       }
       std::cout << "-\n";
+      for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+          if (j == 0) {
+            std::cout << "|\t";
+          }
+          if (visited[i][j]) {
+            std::cout << (char)sign << "\t|\t";
+          } else {
+            std::cout << matrixInput[i][j] << "\t|\t";
+          }
+        }
+        std::cout << '\n';
+        for (int i = 0; i < cols; i++) {
+          std::cout << "----------------";
+        }
+        std::cout << "-\n";
+      }
     }
   }
   void showPoints() {
@@ -274,42 +278,21 @@ public:
       if (i == 0) {
         std::cout << point[i];
       } else {
-        std::cout << ">" << point[i];
+        std::cout << "->" << point[i];
       }
     }
     std::cout << '\n';
   }
   std::string getName() { return name; }
+  char getSign() { return sign; }
+  bool isVisited(int x, int y) { return visited[x][y]; }
 };
 
 void inputMatrix(std::vector<std::vector<int>> &matrixInput, int numRows,
-                 int numCols, std::ifstream &inputFile) {
-  for (int i = 0; i < numRows; i++) {
-    for (int j = 0; j < numCols; j++) {
-      inputFile >> matrixInput[i][j];
-    }
-  }
-}
-void drawMap(std::vector<std::vector<int>> matrix, int rows, int cols) {
-  std::cout << '\n';
-  for (int i = 0; i < cols; i++) {
-    std::cout << "----------------";
-  }
-  std::cout << '\n';
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      if (j == 0) {
-        std::cout << "|\t";
-      }
-      std::cout << matrix[i][j] << "\t|\t";
-    }
-    std::cout << '\n';
-    for (int i = 0; i < cols; i++) {
-      std::cout << "----------------";
-    }
-    std::cout << '\n';
-  }
-}
+                 int numCols, std::ifstream &inputFile);
+void drawMap(std::vector<std::vector<int>> matrix, int rows, int cols);
+void drawPath(std::vector<std::vector<int>> &matrixInput, int rows, int cols,
+              Robot &firstRobot, Robot &secondRobot);
 void clearConsole() { system(CLEAR_SCREEN); }
 
 int main() {
@@ -387,7 +370,7 @@ int main() {
       // to go.
       firstRobot.move(
           firstRobot.determineMove(mode, mainVisitedMap, matrixInput),
-          matrixInput, mainVisitedMap);
+          matrixInput, mainVisitedMap, mode);
       sleep(DELAY_SECOND);
     }
     std::cout << "Robot total points: " << firstRobot.getTotalPoint() << '\n';
@@ -400,10 +383,13 @@ int main() {
       clearConsole();
       firstRobot.move(
           firstRobot.determineMove(mode, mainVisitedMap, matrixInput),
-          matrixInput, mainVisitedMap);
+          matrixInput, mainVisitedMap, mode);
       secondRobot.move(
           secondRobot.determineMove(mode, mainVisitedMap, matrixInput),
-          matrixInput, mainVisitedMap);
+          matrixInput, mainVisitedMap, mode);
+      if (mode == PAIR_NOT_OVERRIDE) {
+        drawPath(matrixInput, numRows, numCols, firstRobot, secondRobot);
+      }
       sleep(DELAY_SECOND);
     }
 
@@ -414,8 +400,7 @@ int main() {
     if (firstRobot.getTotalPoint() > secondRobot.getTotalPoint()) {
       std::cout << "The winter is robot " << firstRobot.getName() << ".\n";
     } else if (firstRobot.getTotalPoint() < secondRobot.getTotalPoint()) {
-      std::cout << "The winter is second robot.";
-      std::cout << "The winter is robot " << firstRobot.getName() << ".\n";
+      std::cout << "The winter is robot " << secondRobot.getName() << ".\n";
     } else {
       std::cout << "Draw.\n";
     }
@@ -425,4 +410,62 @@ int main() {
   }
 
   return 0;
+}
+void inputMatrix(std::vector<std::vector<int>> &matrixInput, int numRows,
+                 int numCols, std::ifstream &inputFile) {
+  for (int i = 0; i < numRows; i++) {
+    for (int j = 0; j < numCols; j++) {
+      inputFile >> matrixInput[i][j];
+    }
+  }
+}
+void drawMap(std::vector<std::vector<int>> matrix, int rows, int cols) {
+  std::cout << '\n';
+  for (int i = 0; i < cols; i++) {
+    std::cout << "----------------";
+  }
+  std::cout << '\n';
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      if (j == 0) {
+        std::cout << "|\t";
+      }
+      std::cout << matrix[i][j] << "\t|\t";
+    }
+    std::cout << '\n';
+    for (int i = 0; i < cols; i++) {
+      std::cout << "----------------";
+    }
+    std::cout << '\n';
+  }
+}
+void drawPath(std::vector<std::vector<int>> &matrixInput, int rows, int cols,
+              Robot &firstRobot, Robot &secondRobot) {
+  // Why ? Put path of 2 robot in the same map in mode 2 will more clean.
+  std::cout << '\n';
+  for (int i = 0; i < cols; i++) {
+    std::cout << "----------------";
+  }
+  std::cout << "-\n";
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      if (j == 0) {
+        std::cout << "|\t";
+      }
+      if (firstRobot.isVisited(i, j) || secondRobot.isVisited(i, j)) {
+        if (firstRobot.isVisited(i, j))
+          std::cout << firstRobot.getSign();
+        if (secondRobot.isVisited(i, j))
+          std::cout << secondRobot.getSign();
+        std::cout << "\t|\t";
+      } else {
+        std::cout << matrixInput[i][j] << "\t|\t";
+      }
+    }
+    std::cout << '\n';
+    for (int i = 0; i < cols; i++) {
+      std::cout << "----------------";
+    }
+    std::cout << "-\n";
+  }
 }
