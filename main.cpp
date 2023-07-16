@@ -61,6 +61,7 @@ public:
         visited[i][j] = false;
       }
     }
+    // Set initial position as visited.
     point.push_back(matrixInput[x][y]);
     visited[x][y] = true;
     mainVisitedMap[x][y] = true;
@@ -69,12 +70,7 @@ public:
   void move(int direction, std::vector<std::vector<int>> &matrixInput,
             std::vector<std::vector<bool>> &mainVisitedMap, int mode) {
     if (direction == END_PATH) {
-
-      std::cout << "Robot " << name << " (sign " << sign << ") "
-                << ":\n";
-      showPoints();
-      drawPath(matrixInput, mode);
-      return;
+      goto log;
     }
 
     switch (direction) {
@@ -102,10 +98,12 @@ public:
     point.push_back(matrixInput[x][y]);
     visited[x][y] = true;
     mainVisitedMap[x][y] = true;
+  log:
     std::cout << "Robot " << name << " (sign " << sign << ") "
               << ":\n";
     showPoints();
     drawPath(matrixInput, mode);
+    return;
   }
   bool isPossibleMove(int moveDirection, int mode,
                       std::vector<std::vector<bool>> &mainVisitedMap) {
@@ -130,8 +128,8 @@ public:
       exit(2);
       break;
     }
-    // Check if not overflow the range of map
-    // Keep in mind that array is zero base so ranger from 0 to n - 1
+    // Check if not overflow the range of map.
+    // Keep in mind that array is zero base so ranger from 0 to n - 1.
     bool isOverFlow =
         (newX < 0 || newX > rows - 1 || newY < 0 || newY > cols - 1) ? true
                                                                      : false;
@@ -139,12 +137,12 @@ public:
       return false;
     }
 
-    // Check not moved to old  position
+    // Check not moved to old  position.
     if (mode == SINGLE || mode == PAIR_ALLOWED_OVERRIDE) {
       if (visited[newX][newY])
         return false;
     }
-    // In mode 2 not moved to other robot moved
+    // In mode 2 not moved to other robot moved.
     else if (mode == PAIR_NOT_OVERRIDE) {
       if (mainVisitedMap[newX][newY])
         return false;
