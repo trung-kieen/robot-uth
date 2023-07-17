@@ -10,7 +10,6 @@ The robot cannot move to a grid position it has previously occupied.
   
 Mode 2: Pair Mode with Restricted Paths
 In this mode, two robots are present on the grid.
-![parMode](images/pairMode.gif)
 Each robot has its own path and cannot cross over to the other robot's path.
 Additionally, each robot cannot move to a grid position it has previously occupied.
   
@@ -37,3 +36,4 @@ To learn more about how to make simple console animation you can check out this 
 
 # License
 This project is released under the MIT License.
+
