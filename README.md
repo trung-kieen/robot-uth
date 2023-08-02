@@ -1,6 +1,3 @@
-
-# Important Notice
-Please note that this program is intended for educational purposes only. It is not meant to be copied and submitted as your final exam project or any other graded assignment. You are encouraged to learn from this code and use it as a reference to build your own unique implementation.
 # Game Modes
  
 Mode 1: Single Player Mode
